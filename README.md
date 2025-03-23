@@ -1,6 +1,6 @@
 # E-commerce Database Project
 
-Este projeto visa a construção de um sistema de banco de dados para um e-commerce, utilizando três tecnologias de banco de dados diferentes para armazenar dados de diferentes entidades:
+Este projeto é dedicado a construção de um sistema de armazenamento de dados para um e-commerce, utilizando micro-serviços com mensageria e três tipos de bancos de dados:
 
 - **PostgreSQL**: Para armazenar dados de clientes e vendedores.
 - **MongoDB**: Para armazenar dados de produtos.
@@ -8,8 +8,8 @@ Este projeto visa a construção de um sistema de banco de dados para um e-comme
 
 ## Tecnologias
 
-- **Python**: A linguagem principal utilizada para a integração e manipulação dos dados.
+- **Python**: A linguagem principal utilizada para a criação dos serviços e integração com a mensageria e banco de dados.
 - **PostgreSQL**: Banco de dados relacional usado para armazenar dados estruturados (clientes, vendedores).
 - **MongoDB**: Banco de dados NoSQL utilizado para armazenar dados semi-estruturados (produtos).
-- **Cassandra**: Banco de dados distribuído NoSQL utilizado para dados de pedidos.
-- **Kafka**: Sistema de menssageria
+- **Cassandra**: Banco de dados NoSQL utilizado para dados de pedidos.
+- **Kafka**: Sistema de mensageria
