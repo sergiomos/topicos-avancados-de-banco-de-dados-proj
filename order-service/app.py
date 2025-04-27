@@ -1,40 +1,68 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 import uvicorn
-from kafka import KafkaProducer
-import json
 import controllers.usuario as usuario
-app = FastAPI(title="Order Service")
+import producer
 
-# Initialize Kafka producer
-producer = KafkaProducer(
-    bootstrap_servers=['kafka:9092'],
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+app = FastAPI(
+    title="Gerar dados",
+    description="Serviço responsável por gerar os dados do ecommerce",
+    version="1.0.0",
+    docs_url="/docs"
 )
 
-@app.get("/")
+@app.get("/",
+    summary="Root endpoint",
+    description="Retorna uma mensagem de Hello World"
+)
 async def root():
-    return {"message": "Order Service - Hello World!"}
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "service": "order-service"}
-
-@app.post("/api/popular/clientes")
-async def get_clientes():
-    return usuario.gerar_clientes(10)
-
-@app.post("/api/popular/vendedores")
-async def get_vendedores():
-    return usuario.gerar_vendedores(10)
+    return {"message": "Gerar dados - Hello World!"}
 
 
-@app.post("/api/orders/event")
-async def create_order_event(event_type: str, order_id: str):
-    # Example of Kafka message publishing
-    producer.send('order-events', {
-        'event_type': event_type,
-        'order_id': order_id
-    })
+@app.post("/api/popular/clientes",
+    summary="Gerar uma quantidade de clientes",
+    description="Gera uma quantidade de clientes para teste",
+    response_description="Lista de dados de clientes gerados"
+)
+async def post_clientes(
+    amount: int = Query(
+        default=10,
+        description="Quantidade de clientes a gerar",
+        ge=1,
+        le=100
+    )
+):
+    clientes = usuario.gerar_clientes(amount)
+    for cliente in clientes:
+        producer.novo_cliente(cliente)
+        
+    return {"message": "Clientes gerados com sucesso",
+            "data": clientes}
+
+@app.post("/api/popular/vendedores",
+    summary="Gerar uma quantidade de vendedores",
+    description="Gera uma quantidade de vendedores para teste",
+    response_description="Lista de dados de vendedores gerados"
+)
+async def get_vendedores(
+    amount: int = Query(
+        default=10,
+        description="Quantidade de vendedores a gerar",
+        ge=1,
+        le=100
+    )
+):
+    return usuario.gerar_vendedores(amount)
+
+@app.post("/api/orders/event",
+    summary="Create order event",
+    description="Creates and publishes an order-related event to Kafka",
+    response_description="Confirmation of event publication"
+)
+async def create_order_event(
+    event_type: str = Query(..., description="Type of the order event"),
+    order_id: str = Query(..., description="ID of the order")
+):
+    producer.order_event(event_type, order_id)
     return {"message": "Event published successfully"}
 
 if __name__ == "__main__":
