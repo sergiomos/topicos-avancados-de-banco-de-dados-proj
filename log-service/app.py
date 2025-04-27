@@ -2,7 +2,27 @@ from fastapi import FastAPI
 import uvicorn
 from kafka import KafkaProducer
 import json
-app = FastAPI(title="User Service")
+
+app = FastAPI(
+    title="Log Service",
+    description="""
+    Service responsible for logging all system events.
+    
+    ## Kafka Integration
+    This service consumes events from the following topics:
+    
+    ### Topic: user-events
+    - **novo_cliente**: Logs new client registrations
+    - **novo_vendedor**: Logs new seller registrations
+    
+    ### Event Processing:
+    All events are logged with the following information:
+    - Timestamp
+    - Event type
+    - Event data
+    - Source service
+    """
+)
 
 # Initialize Kafka producer
 producer = KafkaProducer(

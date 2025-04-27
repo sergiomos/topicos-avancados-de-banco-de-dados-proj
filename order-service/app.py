@@ -34,7 +34,7 @@ async def post_clientes(
     clientes = usuario.gerar_clientes(amount)
     for cliente in clientes:
         producer.novo_cliente(cliente)
-        
+
     return {"message": "Clientes gerados com sucesso",
             "data": clientes}
 
@@ -51,19 +51,13 @@ async def get_vendedores(
         le=100
     )
 ):
-    return usuario.gerar_vendedores(amount)
+    vendedores = usuario.gerar_vendedores(amount)
+    for vendedor in vendedores:
+        producer.novo_vendedor(vendedor)
 
-@app.post("/api/orders/event",
-    summary="Create order event",
-    description="Creates and publishes an order-related event to Kafka",
-    response_description="Confirmation of event publication"
-)
-async def create_order_event(
-    event_type: str = Query(..., description="Type of the order event"),
-    order_id: str = Query(..., description="ID of the order")
-):
-    producer.order_event(event_type, order_id)
-    return {"message": "Event published successfully"}
+    return {"message": "Vendedores gerados com sucesso",
+            "data": vendedores}
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8081) 

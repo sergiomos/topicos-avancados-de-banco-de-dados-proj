@@ -3,9 +3,12 @@ import uuid
 
 fake = Faker('pt_BR')
 
+def random_id():
+    return str(uuid.uuid4())
+
 def gerar_cliente():
     return {
-         'id_cliente': uuid.uuid4(),
+         'id_cliente': random_id(),
             'nome': fake.name(),
             'email': fake.email(),
             'telefone': fake.phone_number(),
@@ -17,7 +20,7 @@ def gerar_clientes(n):
 
 def gerar_vendedor():
     return {
-        'id_vendedor': uuid.uuid4(),
+        'id_vendedor': random_id(),
         'nome': fake.name(),
         'email': fake.email(),
         'telefone': fake.phone_number(),
