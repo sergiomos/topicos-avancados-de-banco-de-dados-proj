@@ -1,33 +1,3 @@
-import random
-from faker import Faker
-
-fake = Faker('pt_BR')
-
-# Gerar clientes com IDs únicos sequenciais
-def gerar_clientes(n):
-    return [
-        {
-            'id_cliente': i + 1,
-            'nome': fake.name(),
-            'email': fake.email(),
-            'telefone': fake.phone_number(),
-            'endereco': fake.address(),
-        }
-        for i in range(n)
-    ]
-
-# Gerar vendedores com IDs únicos sequenciais
-def gerar_vendedores(n):
-    return [
-        {
-            'id_vendedor': i + 1,
-            'nome': fake.name(),
-            'email': fake.email(),
-            'telefone': fake.phone_number(),
-        }
-        for i in range(n)
-    ]
-
 # Gerar produtos com IDs únicos sequenciais
 def gerar_produtos(n):
     return [

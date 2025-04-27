@@ -19,11 +19,11 @@ async def root():
 async def health_check():
     return {"status": "healthy", "service": "order-service"}
 
-@app.get("/api/clientes")
+@app.post("/api/popular/clientes")
 async def get_clientes():
     return usuario.gerar_clientes(10)
 
-@app.get("/api/vendedores")
+@app.post("/api/popular/vendedores")
 async def get_vendedores():
     return usuario.gerar_vendedores(10)
 
