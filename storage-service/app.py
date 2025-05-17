@@ -1,20 +1,52 @@
 from fastapi import FastAPI
 import uvicorn
-from kafka import KafkaProducer
-import json
-import consumer
+import logging
+from database import PostgresConnection, MongoDBConnection, CassandraConnection
 
-app = FastAPI(title="Storage Service")
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# Initialize Kafka producer
-producer = KafkaProducer(
-    bootstrap_servers=['kafka:9092'],
-    value_serializer=lambda v: json.dumps(v).encode('utf-8')
+app = FastAPI(
+    title="Storage Service",
+    description="Service responsible for storing data in different databases",
+    version="1.0.0"
 )
 
 @app.on_event("startup")
 async def startup_event():
-    consumer.run_consumer()
+    """Initialize database connections when the application starts"""
+    try:
+        # Initialize PostgreSQL connection
+        PostgresConnection.initialize()
+        
+        # Initialize MongoDB connection
+        MongoDBConnection.initialize()
+        
+        # Initialize Cassandra connection
+        CassandraConnection.initialize()
+        
+        logger.info("All database connections initialized successfully")
+    except Exception as e:
+        logger.error(f"Error initializing database connections: {str(e)}")
+        raise
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Close database connections when the application shuts down"""
+    try:
+        # Close PostgreSQL connections
+        PostgresConnection.close_all()
+        
+        # Close MongoDB connection
+        MongoDBConnection.close()
+        
+        # Close Cassandra connection
+        CassandraConnection.close()
+        
+        logger.info("All database connections closed successfully")
+    except Exception as e:
+        logger.error(f"Error closing database connections: {str(e)}")
 
 @app.get("/")
 async def root():
