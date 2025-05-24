@@ -1,7 +1,13 @@
 import psycopg2
 from psycopg2 import pool
 import logging
-from ..config import POSTGRES_CONFIG
+
+import sys
+# caution: path[0] is reserved for script path (or '' in REPL)
+sys.path.append('/home/sergiomos/dev/topicos-avancados-de-banco-de-dados-proj/storage-service/config.py')
+
+from config import POSTGRES_CONFIG
+
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,12 @@
 from fastapi import FastAPI
 import uvicorn
 import logging
-from database import PostgresConnection, MongoDBConnection, CassandraConnection
+from database.postgres import PostgresConnection
+from database.mongodb import MongoDBConnection
+from database.cassandra import CassandraConnection
+from database.init_db import init_database
+import consumer
+#from database import PostgresConnection, MongoDBConnection, CassandraConnection
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -15,20 +20,27 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize database connections when the application starts"""
+    """Initialize database connections and tables when the application starts"""
     try:
         # Initialize PostgreSQL connection
         PostgresConnection.initialize()
+        
+        # Initialize database tables
+        if not init_database():
+            raise Exception("Failed to initialize database tables")
         
         # Initialize MongoDB connection
         MongoDBConnection.initialize()
         
         # Initialize Cassandra connection
         CassandraConnection.initialize()
+
+        # Start Kafka consumer
+        consumer.run_consumer()
         
-        logger.info("All database connections initialized successfully")
+        logger.info("All database connections and tables initialized successfully")
     except Exception as e:
-        logger.error(f"Error initializing database connections: {str(e)}")
+        logger.error(f"Error during startup: {str(e)}")
         raise
 
 @app.on_event("shutdown")

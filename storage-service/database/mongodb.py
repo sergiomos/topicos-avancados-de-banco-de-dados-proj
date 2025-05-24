@@ -1,6 +1,10 @@
 from pymongo import MongoClient
 import logging
-from ..config import MONGODB_CONFIG
+
+import sys
+# caution: path[0] is reserved for script path (or '' in REPL)
+sys.path.append('/home/sergiomos/dev/topicos-avancados-de-banco-de-dados-proj/storage-service/config.py')
+from config import MONGODB_CONFIG
 
 logger = logging.getLogger(__name__)
 

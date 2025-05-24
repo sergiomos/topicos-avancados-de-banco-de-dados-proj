@@ -13,6 +13,7 @@ def gerar_cliente():
             'email': fake.email(),
             'telefone': fake.phone_number(),
             'endereco': fake.address(),
+            'ativo': True
     }
 
 def gerar_clientes(n):
@@ -24,6 +25,7 @@ def gerar_vendedor():
         'nome': fake.name(),
         'email': fake.email(),
         'telefone': fake.phone_number(),
+        'ativo': True
     }
 
 def gerar_vendedores(n):
