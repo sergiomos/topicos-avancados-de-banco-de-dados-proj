@@ -39,3 +39,32 @@ class ClienteController:
         except Exception as e:
             logger.error(f"Error inserting cliente: {str(e)}")
             return False 
+
+    @staticmethod
+    def get_cliente_by_id(cliente_id: str) -> dict:
+        """
+        Get a client by their ID
+        Returns the client data if found, None otherwise
+        """
+        try:
+            query = """
+                SELECT id_cliente, nome, email, telefone, endereco, ativo
+                FROM clientes
+                WHERE id_cliente = %s
+            """
+            
+            result = PostgresConnection.execute_query(query, (cliente_id,))
+            if result and len(result) > 0:
+                return {
+                    'id_cliente': result[0][0],
+                    'nome': result[0][1],
+                    'email': result[0][2],
+                    'telefone': result[0][3],
+                    'endereco': result[0][4],
+                    'ativo': result[0][5]
+                }
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error getting cliente by ID: {str(e)}")
+            return None 
