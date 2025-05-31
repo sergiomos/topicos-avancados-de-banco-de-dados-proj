@@ -8,15 +8,20 @@ class PedidoController:
     @staticmethod
     def insert_pedido(pedido_data: dict) -> bool:
         """
-        Insert or update an order in Cassandra
-        Returns True if successful, False otherwise
+        Insere ou atualiza um pedido no Cassandra
+        
+        Args:
+            pedido_data (dict): Dados do pedido a ser inserido/atualizado
+            
+        Returns:
+            bool: True se a operação foi bem-sucedida, False caso contrário
         """
         try:
-            # Add timestamps
+            # Adiciona timestamps
             pedido_data['created_at'] = datetime.utcnow()
             pedido_data['updated_at'] = datetime.utcnow()
             
-            # Prepare the order data
+            # Prepara os dados do pedido
             order_data = {
                 'id_pedido': pedido_data['id_pedido'],
                 'id_cliente': pedido_data['id_cliente'],
@@ -28,7 +33,7 @@ class PedidoController:
                 'updated_at': pedido_data['updated_at']
             }
             
-            # Insert the order
+            # Insere o pedido
             session = CassandraConnection.get_session()
             session.execute("""
                 INSERT INTO pedidos (
@@ -46,7 +51,7 @@ class PedidoController:
                 order_data['updated_at']
             ))
             
-            # Insert order items
+            # Insere os itens do pedido
             for item in pedido_data['itens']:
                 session.execute("""
                     INSERT INTO itens_pedido (
@@ -61,23 +66,28 @@ class PedidoController:
                     datetime.utcnow()
                 ))
             
-            logger.info(f"Pedido {pedido_data['id_pedido']} inserted/updated successfully in Cassandra")
+            logger.info(f"Pedido {pedido_data['id_pedido']} inserido/atualizado com sucesso no Cassandra")
             return True
             
         except Exception as e:
-            logger.error(f"Error inserting pedido in Cassandra: {str(e)}")
+            logger.error(f"Erro ao inserir pedido no Cassandra: {str(e)}")
             return False
 
     @staticmethod
     def get_pedido_by_id(pedido_id: str) -> dict:
         """
-        Get an order by its ID from Cassandra
-        Returns the order data with its items if found, None otherwise
+        Obtém um pedido pelo seu ID do Cassandra
+        
+        Args:
+            pedido_id (str): ID do pedido a ser buscado
+            
+        Returns:
+            dict: Dados do pedido com seus itens se encontrado, None caso contrário
         """
         try:
             session = CassandraConnection.get_session()
             
-            # Get order data
+            # Obtém os dados do pedido
             order_result = session.execute("""
                 SELECT id_pedido, id_cliente, id_vendedor, data_pedido, 
                        status, total, created_at, updated_at
@@ -89,7 +99,7 @@ class PedidoController:
             if not order_row:
                 return None
                 
-            # Convert order row to dict
+            # Converte a linha do pedido para dicionário
             order_data = {
                 'id_pedido': order_row.id_pedido,
                 'id_cliente': order_row.id_cliente,
@@ -101,14 +111,14 @@ class PedidoController:
                 'updated_at': order_row.updated_at
             }
             
-            # Get order items
+            # Obtém os itens do pedido
             items_result = session.execute("""
                 SELECT id_produto, quantidade, preco_unitario, created_at
                 FROM itens_pedido
                 WHERE id_pedido = %s
             """, (pedido_id,))
             
-            # Convert items to list of dicts
+            # Converte os itens para lista de dicionários
             order_data['itens'] = [
                 {
                     'id_produto': item.id_produto,
@@ -122,5 +132,5 @@ class PedidoController:
             return order_data
             
         except Exception as e:
-            logger.error(f"Error getting pedido from Cassandra: {str(e)}")
+            logger.error(f"Erro ao buscar pedido no Cassandra: {str(e)}")
             return None 

@@ -11,79 +11,79 @@ from controllers.produto_controller import ProdutoController
 from controllers.pedido_controller import PedidoController
 #from database import PostgresConnection, MongoDBConnection, CassandraConnection
 
-# Configure logging
+# Configuração do logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="Storage Service",
-    description="Service responsible for storing data in different databases",
+    title="Serviço de Armazenamento",
+    description="Serviço responsável por armazenar dados em diferentes bancos de dados",
     version="1.0.0"
 )
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize database connections and tables when the application starts"""
+    """Inicializa conexões com bancos de dados e tabelas quando a aplicação inicia"""
     try:
-        # Initialize PostgreSQL connection
+        # Inicializa conexão com PostgreSQL
         PostgresConnection.initialize()
         
-        # Initialize database tables
+        # Inicializa tabelas do banco de dados
         if not init_database():
-            raise Exception("Failed to initialize database tables")
+            raise Exception("Falha ao inicializar tabelas do banco de dados")
         
-        # Initialize MongoDB connection
+        # Inicializa conexão com MongoDB
         MongoDBConnection.initialize()
         
-        # Initialize Cassandra connection
+        # Inicializa conexão com Cassandra
         CassandraConnection.initialize()
 
-        # Start Kafka consumer
+        # Inicia consumidor Kafka
         consumer.run_consumer()
         
-        logger.info("All database connections and tables initialized successfully")
+        logger.info("Todas as conexões com bancos de dados e tabelas inicializadas com sucesso")
     except Exception as e:
-        logger.error(f"Error during startup: {str(e)}")
+        logger.error(f"Erro durante a inicialização: {str(e)}")
         raise
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """Close database connections when the application shuts down"""
+    """Fecha conexões com bancos de dados quando a aplicação é encerrada"""
     try:
-        # Close PostgreSQL connections
+        # Fecha conexões PostgreSQL
         PostgresConnection.close_all()
         
-        # Close MongoDB connection
+        # Fecha conexão MongoDB
         MongoDBConnection.close()
         
-        # Close Cassandra connection
+        # Fecha conexão Cassandra
         CassandraConnection.close()
         
-        logger.info("All database connections closed successfully")
+        logger.info("Todas as conexões com bancos de dados fechadas com sucesso")
     except Exception as e:
-        logger.error(f"Error closing database connections: {str(e)}")
+        logger.error(f"Erro ao fechar conexões com bancos de dados: {str(e)}")
 
 @app.get("/")
 async def root():
-    return {"message": "Storage Service - Hello World!"}
+    return {"message": "Serviço de Armazenamento - Olá Mundo!"}
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "Storage-service"}
+    return {"status": "saudável", "service": "Serviço de Armazenamento"}
 
 @app.post("/api/storages/event")
 async def create_storage_event(event_type: str, storage_id: str):
-    # Example of Kafka message publishing
+    # Exemplo de publicação de mensagem Kafka
     producer.send('storage-events', {
         'event_type': event_type,
         'storage_id': storage_id
     })
-    return {"message": "Event published successfully"}
+    return {"message": "Evento publicado com sucesso"}
 
 @app.get("/api/clientes/{cliente_id}")
 async def get_cliente(cliente_id: str):
     """
-    Get a client by their ID
+    Obtém um cliente pelo seu ID
     """
     cliente = ClienteController.get_cliente_by_id(cliente_id)
     if cliente is None:
@@ -93,7 +93,7 @@ async def get_cliente(cliente_id: str):
 @app.get("/api/produtos/{produto_id}")
 async def get_produto(produto_id: str):
     """
-    Get a product by its ID
+    Obtém um produto pelo seu ID
     """
     produto = ProdutoController.get_produto_by_id(produto_id)
     if produto is None:
@@ -103,7 +103,7 @@ async def get_produto(produto_id: str):
 @app.get("/api/pedidos/{pedido_id}")
 async def get_pedido(pedido_id: str):
     """
-    Get an order by its ID
+    Obtém um pedido pelo seu ID
     """
     pedido = PedidoController.get_pedido_by_id(pedido_id)
     if pedido is None:
